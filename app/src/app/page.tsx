@@ -96,6 +96,18 @@ export default function Home() {
         </div>
       )}
 
+      {/* 피드백 */}
+      <div className="mt-6 text-center">
+        <a
+          href="https://docs.google.com/forms/d/e/1FAIpQLSfVHPGPiZYdd0XRIaU0WsbAyB5JB5jkNWlb5Kq4OHTlIXYutA/viewform"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-xs text-gray-400 underline"
+        >
+          💬 불편사항 / 개선 의견 보내기
+        </a>
+      </div>
+
       {/* 프로필 설정 모달 */}
       {showSetup && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
