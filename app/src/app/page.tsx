@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { getProfile, saveProfile, getAgeMonths, getSavedRecipes, BabyProfile } from '@/lib/localStorage';
+import AdBanner from '@/components/AdBanner';
 
 export default function Home() {
   const [profile, setProfile] = useState<BabyProfile | null>(null);
@@ -79,6 +80,9 @@ export default function Home() {
           <p className="font-semibold text-gray-700 text-sm">식재료 뱃지</p>
         </Link>
       </div>
+
+      {/* 광고 배너 */}
+      <AdBanner slot="ADSENSE_SLOT_HOME" className="mb-4 rounded-xl overflow-hidden" />
 
       {/* 최근 레시피 */}
       {recentRecipes.length > 0 && (

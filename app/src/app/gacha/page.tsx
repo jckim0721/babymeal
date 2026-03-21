@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { getProfile, getAgeMonths, saveRecipe, incrementRegenCount } from '@/lib/localStorage';
+import AdBanner from '@/components/AdBanner';
 
 interface RecipeResult {
   title: string;
@@ -212,6 +213,8 @@ export default function GachaPage() {
           >
             {saved ? '✅ 저장됨' : '💾 레시피 저장'}
           </button>
+
+          <AdBanner slot="ADSENSE_SLOT_GACHA" className="mt-4 rounded-xl overflow-hidden" />
         </div>
       )}
     </main>

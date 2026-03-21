@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { getProfile, getAgeMonths, saveRecipe, incrementRegenCount } from '@/lib/localStorage';
+import AdBanner from '@/components/AdBanner';
 
 const INGREDIENTS_BY_CATEGORY: Record<string, string[]> = {
   '탄수화물': ['쌀', '찹쌀', '감자', '고구마', '단호박', '옥수수', '식빵', '오트밀'],
@@ -257,6 +258,8 @@ export default function RecipePage() {
               {saved ? '✅ 저장됨' : '💾 저장'}
             </button>
           </div>
+
+          <AdBanner slot="ADSENSE_SLOT_RECIPE" className="mt-4 rounded-xl overflow-hidden" />
         </div>
       )}
     </main>
