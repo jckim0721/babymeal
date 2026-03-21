@@ -198,7 +198,7 @@ export default function GachaPage() {
           </div>
 
           <a
-            href={`https://www.coupang.com/np/search?q=${encodeURIComponent(result.recipe.coupangKeyword)}`}
+            href={`https://www.coupang.com/np/search?q=${encodeURIComponent(result.recipe.coupangKeyword)}&affiliate=${process.env.NEXT_PUBLIC_COUPANG_PARTNER_ID || ''}`}
             target="_blank"
             rel="noopener noreferrer"
             className="block w-full py-2 border border-amber-300 text-amber-700 text-center rounded-lg text-sm mb-3"
