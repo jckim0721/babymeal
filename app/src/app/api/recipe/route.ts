@@ -34,7 +34,7 @@ ${forbiddenList ? `- 금지/제외 재료: ${forbiddenList}` : ''}
   "ingredients": ["재료1 양", "재료2 양"],
   "steps": ["조리 단계1", "조리 단계2", "조리 단계3"],
   "nutritionNote": "영양 포인트 한 줄",
-  "coupangKeyword": "쿠팡 검색용 핵심 재료명"
+  "coupangKeyword": "쿠팡 검색용 핵심 재료명 1가지 (단어 하나만, 슬래시/콤마 없이)"
 }`;
 
     const message = await client.messages.create({
