@@ -39,7 +39,8 @@ ${forbiddenList ? `- 금지/제외 재료: ${forbiddenList}` : ''}
 
     const message = await client.messages.create({
       model: 'claude-haiku-4-5-20251001',
-      max_tokens: 800,
+      max_tokens: 1000,
+      temperature: 0.7,
       messages: [{ role: 'user', content: prompt }],
     });
 
@@ -52,6 +53,18 @@ ${forbiddenList ? `- 금지/제외 재료: ${forbiddenList}` : ''}
     const jsonMatch = content.text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) throw new Error('JSON not found in response');
     const recipe = JSON.parse(jsonMatch[0]);
+
+    // hallucination 감지: 단어 반복이 심하면 재시도 없이 에러 처리
+    const hasRepetition = (text: string) => {
+      const words = text.split(/\s+/);
+      if (words.length < 10) return false;
+      const window = words.slice(0, 20);
+      const unique = new Set(window).size;
+      return unique < 5; // 20단어 중 고유 단어가 5개 미만이면 비정상
+    };
+    if (recipe.steps?.some((s: string) => hasRepetition(s))) {
+      throw new Error('Repetitive response detected');
+    }
 
     return NextResponse.json({
       recipe,

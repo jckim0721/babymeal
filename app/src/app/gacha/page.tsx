@@ -22,6 +22,25 @@ type AnimState = 'idle' | 'spinning' | 'result';
 
 const SPIN_EMOJIS = ['🥕', '🥦', '🍗', '🐟', '🥚', '🍎', '🥔', '🌽', '🫐', '🍓'];
 
+const INGREDIENT_EMOJI: Record<string, string> = {
+  '쌀': '🍚', '찹쌀': '🍚', '감자': '🥔', '고구마': '🍠', '단호박': '🎃', '옥수수': '🌽',
+  '식빵': '🍞', '오트밀': '🌾', '소고기': '🥩', '닭고기': '🍗', '돼지고기': '🥓',
+  '달걀': '🥚', '계란': '🥚', '두부': '⬜', '연두부': '⬜',
+  '당근': '🥕', '애호박': '🥒', '브로콜리': '🥦', '시금치': '🌿', '양배추': '🥬',
+  '파프리카': '🫑', '버섯': '🍄', '가지': '🍆', '토마토': '🍅',
+  '사과': '🍎', '바나나': '🍌', '배': '🍐', '딸기': '🍓', '블루베리': '🫐',
+  '복숭아': '🍑', '수박': '🍉', '포도': '🍇', '키위': '🥝', '망고': '🥭',
+  '연어': '🐟', '대구': '🐟', '명태': '🐟', '미역': '🌊', '김': '🌊',
+  '요거트': '🥛', '치즈': '🧀', '우유': '🥛', '두유': '🥛',
+};
+
+function getIngredientEmoji(ingredientStr: string): string {
+  for (const [key, emoji] of Object.entries(INGREDIENT_EMOJI)) {
+    if (ingredientStr.includes(key)) return emoji;
+  }
+  return SPIN_EMOJIS[Math.floor(Math.random() * SPIN_EMOJIS.length)];
+}
+
 export default function GachaPage() {
   const [ageMonths, setAgeMonths] = useState(12);
   const [babyName, setBabyName] = useState('');
@@ -81,11 +100,12 @@ export default function GachaPage() {
       await new Promise(r => setTimeout(r, 1500));
       if (spinRef.current) clearInterval(spinRef.current);
 
-      // 결과 재료로 슬롯 멈추기
-      const mainIngredients = data.recipe.ingredients.slice(0, 3).map(() =>
-        SPIN_EMOJIS[Math.floor(Math.random() * SPIN_EMOJIS.length)]
+      // 실제 재료 이모지로 슬롯 멈추기
+      const mainIngredients = data.recipe.ingredients.slice(0, 3).map((ing: string) =>
+        getIngredientEmoji(ing)
       );
-      setDisplayEmojis(mainIngredients.length >= 3 ? mainIngredients : ['🍳', '🍳', '🍳']);
+      while (mainIngredients.length < 3) mainIngredients.push('🍳');
+      setDisplayEmojis(mainIngredients);
 
       setResult(data);
       setAnimState('result');
