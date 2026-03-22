@@ -344,9 +344,18 @@ export default function GachaPage() {
               </ol>
             </div>
 
-            <div className="bg-amber-50 rounded-lg p-3 mb-4 text-sm text-amber-700">
+            <div className="bg-amber-50 rounded-lg p-3 mb-3 text-sm text-amber-700">
               💡 {bonusResult.recipe.nutritionNote}
             </div>
+
+            <a
+              href={`https://www.coupang.com/np/search?q=${encodeURIComponent(bonusResult.recipe.coupangKeyword.replace(/[,/]\s*/g, ' '))}&affiliate=${process.env.NEXT_PUBLIC_COUPANG_PARTNER_ID || ''}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full py-2 border border-amber-300 text-amber-700 text-center rounded-lg text-sm mb-3"
+            >
+              🛒 {bonusResult.recipe.coupangKeyword} 쿠팡에서 보기
+            </a>
 
             <button
               onClick={() => {
