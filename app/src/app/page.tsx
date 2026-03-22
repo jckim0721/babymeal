@@ -96,6 +96,42 @@ export default function Home() {
         </div>
       )}
 
+      {/* 이유식 단계 가이드 */}
+      <div className="bg-white rounded-2xl p-5 shadow-sm mt-4">
+        <h2 className="font-bold text-gray-800 mb-3">📖 이유식 단계 가이드</h2>
+        <div className="space-y-3 text-sm text-gray-600">
+          <div className="border-l-4 border-amber-200 pl-3">
+            <p className="font-semibold text-gray-700">초기 이유식 (6~8개월)</p>
+            <p>쌀미음으로 시작해 채소·과일 퓨레를 도입합니다. 한 가지 재료씩 4일 이상 먹여보며 알레르기 반응을 확인하세요. 하루 1~2회, 한 번에 1~2 티스푼부터 시작합니다.</p>
+          </div>
+          <div className="border-l-4 border-amber-300 pl-3">
+            <p className="font-semibold text-gray-700">중기 이유식 (9~11개월)</p>
+            <p>다양한 재료를 조합할 수 있습니다. 으깬 형태의 죽과 부드러운 핑거푸드를 시도해보세요. 소고기·닭고기 등 단백질 식품도 이 시기에 꼭 넣어주세요. 하루 2~3회 규칙적으로 먹입니다.</p>
+          </div>
+          <div className="border-l-4 border-amber-400 pl-3">
+            <p className="font-semibold text-gray-700">후기 이유식 (12~15개월)</p>
+            <p>무른밥·진밥으로 넘어가는 시기입니다. 가족 식사에 가까운 형태로 점차 전환하며, 다양한 요리를 경험시켜 주세요. 편식이 시작될 수 있으니 색깔·질감 다양성이 중요합니다.</p>
+          </div>
+          <div className="border-l-4 border-amber-500 pl-3">
+            <p className="font-semibold text-gray-700">완료기·유아식 (16개월+)</p>
+            <p>가족과 거의 같은 음식을 먹을 수 있습니다. 단, 염분·당분은 아직 줄여주세요. 잔치국수, 프리타타, 리조또 등 다양한 메뉴를 즐길 수 있는 시기입니다.</p>
+          </div>
+        </div>
+      </div>
+
+      {/* 이유식 TIP */}
+      <div className="bg-amber-50 border border-amber-100 rounded-2xl p-5 shadow-sm mt-4">
+        <h2 className="font-bold text-gray-800 mb-3">💡 이유식 꿀팁</h2>
+        <ul className="space-y-2 text-sm text-gray-600">
+          <li>🥩 <strong>철분이 풍부한 소고기</strong>는 6개월부터 꼭 먹이세요. 모유 속 철분이 부족해지는 시기입니다.</li>
+          <li>🥜 <strong>알레르기 유발 식품</strong>(계란, 땅콩, 생선 등)은 오히려 일찍 도입할수록 알레르기 예방에 도움이 됩니다.</li>
+          <li>🧂 <strong>1세 미만</strong>에는 소금·설탕·꿀을 넣지 마세요. 아이 신장에 부담이 됩니다.</li>
+          <li>🌿 <strong>채소 거부</strong> 시 소고기 육수에 채소를 섞거나, 으깨서 죽에 숨겨보세요.</li>
+          <li>❄️ <strong>냉동 보관</strong>이 가능한 이유식은 주 1~2회 대량 조리해 얼려두면 편리합니다.</li>
+          <li>🍳 <strong>재료를 바꿔가며</strong> 다양한 맛을 경험시켜주는 것이 편식 예방의 핵심입니다.</li>
+        </ul>
+      </div>
+
       {/* 피드백 */}
       <div className="mt-6 text-center">
         <a

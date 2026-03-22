@@ -278,6 +278,16 @@ export default function GachaPage() {
           <AdBanner slot="ADSENSE_SLOT_GACHA" className="mt-4 rounded-xl overflow-hidden" />
         </div>
       )}
+      {/* 이유식 TIP */}
+      <div className="bg-white rounded-2xl p-5 shadow-sm mt-4">
+        <h2 className="font-bold text-gray-700 mb-3 text-sm">💡 오늘의 이유식 TIP</h2>
+        <ul className="space-y-2 text-xs text-gray-500">
+          <li>🎲 매일 다른 레시피로 다양한 맛을 경험시켜주세요. 편식 예방에 도움이 됩니다.</li>
+          <li>🥄 새로운 재료는 오전에 먹여야 알레르기 반응을 낮에 확인할 수 있어요.</li>
+          <li>😊 아이가 처음 거부해도 10~15번 이상 시도해보세요. 익숙해지면 먹게 됩니다.</li>
+          <li>🌡️ 이유식 온도는 체온과 비슷한 36~37°C가 적당합니다.</li>
+        </ul>
+      </div>
     </main>
   );
 }
