@@ -22,6 +22,24 @@ type AnimState = 'idle' | 'spinning' | 'result';
 
 const SPIN_EMOJIS = ['🥕', '🥦', '🍗', '🐟', '🥚', '🍎', '🥔', '🌽', '🫐', '🍓'];
 
+// 개월수에 따라 적합한 레시피 타입
+function getRecipeTypes(ageMonths: number): string[] {
+  if (ageMonths < 9) return ['미음', '초기 이유식죽', '퓨레'];
+  if (ageMonths < 12) return ['중기 이유식죽', '으깬 채소 볶음', '부드러운 찜', '야채 스프'];
+  if (ageMonths < 18) return ['무른밥', '볶음밥', '야채죽', '찜', '국', '미트볼', '팬케이크'];
+  return ['진밥', '볶음밥', '국', '찜', '볶음', '샌드위치', '핑거푸드', '스프', '오믈렛', '된장국'];
+}
+
+const RECENT_TITLES_KEY = 'gacha_recent_titles';
+function getRecentTitles(): string[] {
+  try { return JSON.parse(localStorage.getItem(RECENT_TITLES_KEY) || '[]'); } catch { return []; }
+}
+function addRecentTitle(title: string) {
+  const recent = getRecentTitles();
+  const updated = [title, ...recent.filter(t => t !== title)].slice(0, 5);
+  localStorage.setItem(RECENT_TITLES_KEY, JSON.stringify(updated));
+}
+
 const INGREDIENT_EMOJI: Record<string, string> = {
   '쌀': '🍚', '찹쌀': '🍚', '감자': '🥔', '고구마': '🍠', '단호박': '🎃', '옥수수': '🌽',
   '식빵': '🍞', '오트밀': '🌾', '소고기': '🥩', '닭고기': '🍗', '돼지고기': '🥓',
@@ -88,10 +106,14 @@ export default function GachaPage() {
     startSpin();
 
     try {
+      const types = getRecipeTypes(ageMonths);
+      const recipeType = types[Math.floor(Math.random() * types.length)];
+      const recentTitles = getRecentTitles();
+
       const res = await fetch('/api/recipe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ingredients: [], ageMonths, isRandom: true }),
+        body: JSON.stringify({ ingredients: [], ageMonths, isRandom: true, recipeType, recentTitles }),
       });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
@@ -107,6 +129,7 @@ export default function GachaPage() {
       while (mainIngredients.length < 3) mainIngredients.push('🍳');
       setDisplayEmojis(mainIngredients);
 
+      if (data.recipe?.title) addRecentTitle(data.recipe.title);
       setResult(data);
       setAnimState('result');
     } catch {

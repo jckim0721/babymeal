@@ -6,7 +6,7 @@ const client = new Anthropic();
 
 export async function POST(req: NextRequest) {
   try {
-    const { ingredients, ageMonths, allergies = [], isRandom = false } = await req.json();
+    const { ingredients, ageMonths, allergies = [], isRandom = false, recipeType, recentTitles = [] } = await req.json();
 
     // 안전 경고 체크
     const warnings = checkSafety(isRandom ? [] : ingredients, ageMonths);
@@ -27,6 +27,8 @@ export async function POST(req: NextRequest) {
 ${forbiddenList ? `- 금지/제외 재료: ${forbiddenList}` : ''}
 
 사용할 재료: ${ingredientText}
+${recipeType ? `레시피 형태: ${recipeType} (반드시 이 형태로 만들어주세요)` : ''}
+${recentTitles.length > 0 ? `제외할 레시피 (이전에 나온 것, 비슷한 것도 피해주세요): ${recentTitles.join(', ')}` : ''}
 
 응답은 반드시 아래 JSON 형식으로만 해주세요:
 {
