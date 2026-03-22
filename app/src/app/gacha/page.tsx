@@ -20,6 +20,8 @@ interface Warning {
 
 type AnimState = 'idle' | 'spinning' | 'result';
 
+const JACKPOT_CHANCE = 0.25; // 25% 확률
+
 const SPIN_EMOJIS = ['🥕', '🥦', '🍗', '🐟', '🥚', '🍎', '🥔', '🌽', '🫐', '🍓'];
 
 // 개월수에 따라 적합한 레시피 타입
@@ -83,7 +85,10 @@ export default function GachaPage() {
   const [animState, setAnimState] = useState<AnimState>('idle');
   const [displayEmojis, setDisplayEmojis] = useState(['🍳', '🍳', '🍳']);
   const [result, setResult] = useState<{ recipe: RecipeResult; warnings: Warning[]; stage: string } | null>(null);
+  const [bonusResult, setBonusResult] = useState<{ recipe: RecipeResult; warnings: Warning[]; stage: string } | null>(null);
+  const [isJackpot, setIsJackpot] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [savedBonus, setSavedBonus] = useState(false);
   const spinRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
@@ -97,7 +102,10 @@ export default function GachaPage() {
   const startSpin = () => {
     setAnimState('spinning');
     setResult(null);
+    setBonusResult(null);
+    setIsJackpot(false);
     setSaved(false);
+    setSavedBonus(false);
 
     // 슬롯머신 애니메이션
     let tick = 0;
@@ -125,27 +133,53 @@ export default function GachaPage() {
 
     try {
       const types = getRecipeTypes(ageMonths);
-      const recipeType = types[Math.floor(Math.random() * types.length)];
       const recentTitles = getRecentTitles();
+      const jackpot = Math.random() < JACKPOT_CHANCE;
 
-      const res = await fetch('/api/recipe', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ingredients: [], ageMonths, isRandom: true, recipeType, recentTitles }),
-      });
-      const data = await res.json();
+      // 첫 번째 레시피 (+ 잭팟이면 두 번째도 동시에)
+      const type1 = types[Math.floor(Math.random() * types.length)];
+      let type2 = types[Math.floor(Math.random() * types.length)];
+      while (type2 === type1 && types.length > 1) {
+        type2 = types[Math.floor(Math.random() * types.length)];
+      }
+
+      const fetches = [
+        fetch('/api/recipe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ingredients: [], ageMonths, isRandom: true, recipeType: type1, recentTitles }),
+        }),
+        ...(jackpot ? [fetch('/api/recipe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ingredients: [], ageMonths, isRandom: true, recipeType: type2, recentTitles }),
+        })] : []),
+      ];
+
+      const responses = await Promise.all(fetches);
+      const [data, bonusData] = await Promise.all(responses.map(r => r.json()));
       if (data.error) throw new Error(data.error);
 
       // 애니메이션이 최소 1.5초 돌게
       await new Promise(r => setTimeout(r, 1500));
       if (spinRef.current) clearInterval(spinRef.current);
 
-      // 실제 재료 이모지로 슬롯 멈추기
-      const mainIngredients = data.recipe.ingredients.slice(0, 3).map((ing: string) =>
-        getIngredientEmoji(ing)
-      );
-      while (mainIngredients.length < 3) mainIngredients.push('🍳');
-      setDisplayEmojis(mainIngredients);
+      if (jackpot) {
+        // 잭팟: 슬롯 이모지 3개 같은 걸로 (🎉🎉🎉)
+        setDisplayEmojis(['🎉', '🎉', '🎉']);
+        setIsJackpot(true);
+        if (bonusData && !bonusData.error) {
+          if (bonusData.recipe?.title) addRecentTitle(bonusData.recipe.title);
+          setBonusResult(bonusData);
+        }
+      } else {
+        // 실제 재료 이모지로 슬롯 멈추기
+        const mainIngredients = data.recipe.ingredients.slice(0, 3).map((ing: string) =>
+          getIngredientEmoji(ing)
+        );
+        while (mainIngredients.length < 3) mainIngredients.push('🍳');
+        setDisplayEmojis(mainIngredients);
+      }
 
       if (data.recipe?.title) addRecentTitle(data.recipe.title);
       setResult(data);
@@ -278,6 +312,64 @@ export default function GachaPage() {
           <AdBanner slot="ADSENSE_SLOT_GACHA" className="mt-4 rounded-xl overflow-hidden" />
         </div>
       )}
+      {/* 잭팟 보너스 레시피 */}
+      {isJackpot && bonusResult && animState === 'result' && (
+        <div className="mt-4">
+          <div className="bg-gradient-to-r from-yellow-400 to-amber-400 rounded-2xl p-4 text-center mb-3 shadow-md">
+            <p className="text-2xl font-black text-white">🎊 더블 레시피 당첨! 🎊</p>
+            <p className="text-white text-sm mt-1">오늘 운이 좋네요! 보너스 레시피가 하나 더!</p>
+          </div>
+          <div className="bg-white rounded-2xl p-5 shadow-sm border-2 border-amber-300">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-xs bg-amber-400 text-white px-2 py-0.5 rounded-full font-bold">BONUS</span>
+              <h2 className="text-xl font-bold">{bonusResult.recipe.title}</h2>
+            </div>
+            <p className="text-sm text-amber-600 mb-3">{bonusResult.stage}</p>
+
+            <div className="mb-3">
+              <p className="font-semibold text-gray-700 mb-1">📝 재료</p>
+              <ul className="text-sm text-gray-600 space-y-0.5">
+                {bonusResult.recipe.ingredients.map((ing, i) => (
+                  <li key={i}>· {ing}</li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="mb-3">
+              <p className="font-semibold text-gray-700 mb-1">👨‍🍳 조리법</p>
+              <ol className="text-sm text-gray-600 space-y-1">
+                {bonusResult.recipe.steps.map((step, i) => (
+                  <li key={i}>{i + 1}. {step}</li>
+                ))}
+              </ol>
+            </div>
+
+            <div className="bg-amber-50 rounded-lg p-3 mb-4 text-sm text-amber-700">
+              💡 {bonusResult.recipe.nutritionNote}
+            </div>
+
+            <button
+              onClick={() => {
+                if (!bonusResult) return;
+                saveRecipe({
+                  title: bonusResult.recipe.title,
+                  ingredients: bonusResult.recipe.ingredients,
+                  steps: bonusResult.recipe.steps,
+                  nutritionNote: bonusResult.recipe.nutritionNote,
+                  ageMonths,
+                  triedIngredients: bonusResult.recipe.ingredients.map(i => i.split(' ')[0]),
+                });
+                setSavedBonus(true);
+              }}
+              disabled={savedBonus}
+              className="w-full py-2 bg-amber-400 text-white rounded-lg text-sm font-medium disabled:opacity-60"
+            >
+              {savedBonus ? '✅ 저장됨' : '💾 보너스 레시피 저장'}
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* 이유식 TIP */}
       <div className="bg-white rounded-2xl p-5 shadow-sm mt-4">
         <h2 className="font-bold text-gray-700 mb-3 text-sm">💡 오늘의 이유식 TIP</h2>
