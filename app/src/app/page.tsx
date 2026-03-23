@@ -41,6 +41,16 @@ export default function Home() {
     setShowSetup(false);
   };
 
+  const handleSkip = () => {
+    const oneYearAgo = new Date();
+    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+    const birthDate = oneYearAgo.toISOString().split('T')[0];
+    const p: BabyProfile = { name: '', birthDate, allergies: [] };
+    saveProfile(p);
+    setProfile(p);
+    setShowSetup(false);
+  };
+
   const ageMonths = profile ? getAgeMonths(profile.birthDate) : 0;
 
   return (
@@ -221,12 +231,19 @@ export default function Home() {
               </div>
             </div>
             <div className="flex gap-2 mt-4">
-              {profile && (
+              {profile ? (
                 <button
                   onClick={() => setShowSetup(false)}
                   className="flex-1 py-2 border rounded-lg text-gray-600"
                 >
                   취소
+                </button>
+              ) : (
+                <button
+                  onClick={handleSkip}
+                  className="flex-1 py-2 border rounded-lg text-gray-400 text-sm"
+                >
+                  건너뛰기
                 </button>
               )}
               <button
