@@ -8,7 +8,18 @@ import AdBanner from '@/components/AdBanner';
 export default function Home() {
   const [profile, setProfile] = useState<BabyProfile | null>(null);
   const [showSetup, setShowSetup] = useState(false);
-  const [form, setForm] = useState({ name: '', birthDate: '' });
+  const [form, setForm] = useState({ name: '', birthDate: '', allergies: [] as string[] });
+
+  const ALLERGENS = ['계란', '우유', '밀', '땅콩', '견과류', '생선', '조개류', '콩/두부'];
+
+  const toggleAllergen = (item: string) => {
+    setForm(f => ({
+      ...f,
+      allergies: f.allergies.includes(item)
+        ? f.allergies.filter(a => a !== item)
+        : [...f.allergies, item],
+    }));
+  };
   const [recentRecipes, setRecentRecipes] = useState<{ title: string; id: string }[]>([]);
 
   useEffect(() => {
@@ -24,7 +35,7 @@ export default function Home() {
 
   const handleSaveProfile = () => {
     if (!form.name || !form.birthDate) return;
-    const p: BabyProfile = { name: form.name, birthDate: form.birthDate, allergies: [] };
+    const p: BabyProfile = { name: form.name, birthDate: form.birthDate, allergies: form.allergies };
     saveProfile(p);
     setProfile(p);
     setShowSetup(false);
@@ -42,17 +53,31 @@ export default function Home() {
 
       {/* 프로필 카드 */}
       {profile && (
-        <div className="bg-white rounded-2xl p-4 mb-4 shadow-sm flex items-center justify-between">
-          <div>
-            <p className="font-bold text-gray-800">{profile.name}</p>
-            <p className="text-sm text-gray-500">{ageMonths}개월 · {getStageLabel(ageMonths)}</p>
+        <div className="bg-white rounded-2xl p-4 mb-4 shadow-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-bold text-gray-800">{profile.name}</p>
+              <p className="text-sm text-gray-500">{ageMonths}개월 · {getStageLabel(ageMonths)}</p>
+            </div>
+            <button
+              onClick={() => {
+                setForm({ name: profile.name, birthDate: profile.birthDate, allergies: profile.allergies ?? [] });
+                setShowSetup(true);
+              }}
+              className="text-xs text-gray-400 underline"
+            >
+              변경
+            </button>
           </div>
-          <button
-            onClick={() => setShowSetup(true)}
-            className="text-xs text-gray-400 underline"
-          >
-            변경
-          </button>
+          {profile.allergies && profile.allergies.length > 0 && (
+            <div className="mt-2 flex flex-wrap gap-1">
+              {profile.allergies.map(a => (
+                <span key={a} className="text-xs bg-red-50 text-red-500 border border-red-200 rounded-full px-2 py-0.5">
+                  🚫 {a}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
@@ -144,6 +169,13 @@ export default function Home() {
         </a>
       </div>
 
+      {/* 면책 조항 */}
+      <div className="mt-4 mb-6 p-3 bg-gray-50 rounded-xl border border-gray-100">
+        <p className="text-xs text-gray-400 leading-relaxed">
+          ⚠️ 본 앱의 레시피는 AI가 생성한 참고 정보입니다. 아이의 알레르기·건강 상태에 따라 소아과 전문의 또는 영양사와 상담 후 사용하세요. 레시피 실행으로 인한 결과에 대해 앱 운영자는 책임을 지지 않습니다.
+        </p>
+      </div>
+
       {/* 프로필 설정 모달 */}
       {showSetup && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
@@ -167,6 +199,25 @@ export default function Home() {
                   value={form.birthDate}
                   onChange={e => setForm(f => ({ ...f, birthDate: e.target.value }))}
                 />
+              </div>
+              <div>
+                <label className="text-sm text-gray-600">알레르기 (해당 항목 선택)</label>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {ALLERGENS.map(item => (
+                    <button
+                      key={item}
+                      type="button"
+                      onClick={() => toggleAllergen(item)}
+                      className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
+                        form.allergies.includes(item)
+                          ? 'bg-red-100 border-red-400 text-red-600 font-semibold'
+                          : 'bg-gray-50 border-gray-200 text-gray-500'
+                      }`}
+                    >
+                      {form.allergies.includes(item) ? '🚫 ' : ''}{item}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
             <div className="flex gap-2 mt-4">

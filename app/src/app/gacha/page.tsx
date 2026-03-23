@@ -91,11 +91,14 @@ export default function GachaPage() {
   const [savedBonus, setSavedBonus] = useState(false);
   const spinRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  const [allergies, setAllergies] = useState<string[]>([]);
+
   useEffect(() => {
     const p = getProfile();
     if (p) {
       setAgeMonths(getAgeMonths(p.birthDate));
       setBabyName(p.name);
+      setAllergies(p.allergies ?? []);
     }
   }, []);
 
@@ -147,12 +150,12 @@ export default function GachaPage() {
         fetch('/api/recipe', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ingredients: [], ageMonths, isRandom: true, recipeType: type1, recentTitles }),
+          body: JSON.stringify({ ingredients: [], ageMonths, isRandom: true, recipeType: type1, recentTitles, allergies }),
         }),
         ...(jackpot ? [fetch('/api/recipe', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ingredients: [], ageMonths, isRandom: true, recipeType: type2, recentTitles }),
+          body: JSON.stringify({ ingredients: [], ageMonths, isRandom: true, recipeType: type2, recentTitles, allergies }),
         })] : []),
       ];
 

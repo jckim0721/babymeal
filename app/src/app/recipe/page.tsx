@@ -35,12 +35,14 @@ export default function RecipePage() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<{ recipe: RecipeResult; warnings: Warning[]; stage: string } | null>(null);
   const [saved, setSaved] = useState(false);
+  const [allergies, setAllergies] = useState<string[]>([]);
 
   useEffect(() => {
     const p = getProfile();
     if (p) {
       setAgeMonths(getAgeMonths(p.birthDate));
       setBabyName(p.name);
+      setAllergies(p.allergies ?? []);
     }
   }, []);
 
@@ -72,7 +74,7 @@ export default function RecipePage() {
       const res = await fetch('/api/recipe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ingredients: selected, ageMonths }),
+        body: JSON.stringify({ ingredients: selected, ageMonths, allergies }),
       });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
