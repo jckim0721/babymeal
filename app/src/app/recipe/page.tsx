@@ -5,11 +5,24 @@ import { getProfile, getAgeMonths, saveRecipe, incrementRegenCount } from '@/lib
 import AdBanner from '@/components/AdBanner';
 
 const INGREDIENTS_BY_CATEGORY: Record<string, string[]> = {
-  '탄수화물': ['쌀', '찹쌀', '감자', '고구마', '단호박', '옥수수', '식빵', '오트밀'],
-  '단백질': ['소고기', '닭고기', '돼지고기', '달걀', '두부', '연두부', '검은콩', '렌틸콩'],
+  '탄수화물': ['쌀', '찹쌀', '감자', '고구마', '단호박', '옥수수', '식빵', '오트밀', '밀가루'],
+  '단백질': ['소고기', '닭고기', '돼지고기', '달걀', '두부', '연두부', '검은콩', '렌틸콩', '땅콩', '아몬드'],
   '채소': ['당근', '애호박', '브로콜리', '시금치', '양배추', '배추', '무', '파프리카', '버섯'],
   '과일': ['사과', '바나나', '배', '딸기', '블루베리', '복숭아', '수박', '참외'],
-  '해산물': ['연어', '대구', '명태', '미역', '김'],
+  '해산물': ['연어', '대구', '명태', '미역', '김', '조개', '바지락', '홍합', '굴', '새우'],
+  '유제품': ['우유', '치즈', '버터', '요거트'],
+};
+
+// 알레르기 → 관련 재료 키워드 매핑
+const ALLERGEN_KEYWORDS: Record<string, string[]> = {
+  '계란': ['달걀'],
+  '우유': ['우유', '치즈', '버터', '요거트'],
+  '밀': ['식빵', '밀가루'],
+  '땅콩': ['땅콩'],
+  '견과류': ['아몬드', '호두', '잣'],
+  '생선': ['연어', '대구', '명태'],
+  '조개류': ['조개', '바지락', '홍합', '굴', '새우'],
+  '콩/두부': ['두부', '연두부', '검은콩', '렌틸콩'],
 };
 
 interface RecipeResult {
@@ -46,7 +59,14 @@ export default function RecipePage() {
     }
   }, []);
 
+  const isAllergenItem = (item: string): boolean => {
+    return allergies.some(allergy =>
+      ALLERGEN_KEYWORDS[allergy]?.some(kw => item === kw)
+    );
+  };
+
   const toggleIngredient = (item: string) => {
+    if (isAllergenItem(item)) return;
     setSelected(prev =>
       prev.includes(item) ? prev.filter(i => i !== item) : [...prev, item]
     );
@@ -131,19 +151,26 @@ export default function RecipePage() {
       {/* 재료 선택 */}
       <div className="bg-white rounded-xl p-4 mb-3 shadow-sm">
         <div className="flex flex-wrap gap-2">
-          {INGREDIENTS_BY_CATEGORY[activeCategory].map(item => (
-            <button
-              key={item}
-              onClick={() => toggleIngredient(item)}
-              className={`px-3 py-1.5 rounded-full text-sm transition-colors ${
-                selected.includes(item)
-                  ? 'bg-amber-400 text-white'
-                  : 'bg-gray-100 text-gray-700'
-              }`}
-            >
-              {item}
-            </button>
-          ))}
+          {INGREDIENTS_BY_CATEGORY[activeCategory].map(item => {
+            const allergen = isAllergenItem(item);
+            return (
+              <button
+                key={item}
+                onClick={() => toggleIngredient(item)}
+                disabled={allergen}
+                title={allergen ? '알레르기 항목' : undefined}
+                className={`px-3 py-1.5 rounded-full text-sm transition-colors ${
+                  allergen
+                    ? 'bg-red-50 text-red-300 border border-red-200 line-through cursor-not-allowed'
+                    : selected.includes(item)
+                    ? 'bg-amber-400 text-white'
+                    : 'bg-gray-100 text-gray-700'
+                }`}
+              >
+                {allergen ? `🚫 ${item}` : item}
+              </button>
+            );
+          })}
         </div>
         {/* 직접 입력 */}
         <div className="flex gap-2 mt-3">
