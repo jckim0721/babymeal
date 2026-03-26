@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
+import Link from "next/link";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -40,7 +41,16 @@ export default function RootLayout({
           />
         )}
       </head>
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        {children}
+        <footer className="text-center text-gray-400 text-xs py-6 space-x-4 border-t border-orange-100 bg-orange-50">
+          <Link href="/about" className="hover:text-orange-500">서비스 소개</Link>
+          <span>·</span>
+          <Link href="/privacy-policy" className="hover:text-orange-500">개인정보처리방침</Link>
+          <span>·</span>
+          <Link href="/terms-of-service" className="hover:text-orange-500">이용약관</Link>
+        </footer>
+      </body>
     </html>
   );
 }
