@@ -122,7 +122,7 @@ export default function Home() {
         </Link>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 mb-6">
+      <div className="grid grid-cols-2 gap-3 mb-4">
         <Link href="/history" className="bg-white rounded-2xl p-4 shadow-sm text-center hover:shadow-md transition-shadow">
           <div className="text-2xl mb-1">📋</div>
           <p className="font-semibold text-gray-700 text-sm">저장된 레시피</p>
@@ -134,7 +134,7 @@ export default function Home() {
       </div>
 
       {/* 광고 배너 */}
-      <AdBanner slot="ADSENSE_SLOT_HOME" className="mb-4 rounded-xl overflow-hidden" />
+      <AdBanner slot="ADSENSE_SLOT_HOME" className="rounded-xl overflow-hidden" />
 
       {/* 최근 레시피 */}
       {recentRecipes.length > 0 && (
