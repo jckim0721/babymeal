@@ -1,13 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { getProfile, saveProfile, getAgeMonths, getSavedRecipes, BabyProfile } from '@/lib/localStorage';
 import AdBanner from '@/components/AdBanner';
 
 export default function Home() {
+  const router = useRouter();
   const [profile, setProfile] = useState<BabyProfile | null>(null);
   const [showSetup, setShowSetup] = useState(false);
+  const [pendingNav, setPendingNav] = useState<string | null>(null);
   const [form, setForm] = useState({ name: '', birthDate: '', allergies: [] as string[] });
 
   const ALLERGENS = ['계란', '우유', '밀', '땅콩', '견과류', '생선', '조개류', '콩/두부'];
@@ -37,16 +39,20 @@ export default function Home() {
     saveProfile(p);
     setProfile(p);
     setShowSetup(false);
+    if (pendingNav) {
+      router.push(pendingNav);
+      setPendingNav(null);
+    }
   };
 
-  const handleSkip = () => {
-    const oneYearAgo = new Date();
-    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
-    const birthDate = oneYearAgo.toISOString().split('T')[0];
-    const p: BabyProfile = { name: '', birthDate, allergies: [] };
-    saveProfile(p);
-    setProfile(p);
-    setShowSetup(false);
+  // 프로필 없을 때 버튼 클릭 시 모달 표시, 있으면 바로 이동
+  const handleNav = (href: string) => {
+    if (!profile) {
+      setPendingNav(href);
+      setShowSetup(true);
+    } else {
+      router.push(href);
+    }
   };
 
   const ageMonths = profile ? getAgeMonths(profile.birthDate) : 0;
@@ -104,27 +110,27 @@ export default function Home() {
 
       {/* 메인 버튼 */}
       <div className="grid grid-cols-2 gap-3 mb-4">
-        <Link href="/recipe" className="bg-white rounded-2xl p-5 shadow-sm text-center hover:shadow-md transition-shadow">
+        <button onClick={() => handleNav('/recipe')} className="bg-white rounded-2xl p-5 shadow-sm text-center hover:shadow-md transition-shadow">
           <div className="text-3xl mb-2">🥕</div>
           <p className="font-bold text-gray-800">재료로 만들기</p>
           <p className="text-xs text-gray-400 mt-1">냉장고 재료 선택</p>
-        </Link>
-        <Link href="/gacha" className="bg-amber-400 rounded-2xl p-5 shadow-sm text-center hover:shadow-md transition-shadow">
+        </button>
+        <button onClick={() => handleNav('/gacha')} className="bg-amber-400 rounded-2xl p-5 shadow-sm text-center hover:shadow-md transition-shadow">
           <div className="text-3xl mb-2">🎰</div>
           <p className="font-bold text-white">오늘의 뽑기</p>
           <p className="text-xs text-amber-100 mt-1">랜덤 레시피 추천</p>
-        </Link>
+        </button>
       </div>
 
       <div className="grid grid-cols-2 gap-3 mb-6">
-        <Link href="/history" className="bg-white rounded-2xl p-4 shadow-sm text-center hover:shadow-md transition-shadow">
+        <button onClick={() => handleNav('/history')} className="bg-white rounded-2xl p-4 shadow-sm text-center hover:shadow-md transition-shadow">
           <div className="text-2xl mb-1">📋</div>
           <p className="font-semibold text-gray-700 text-sm">저장된 레시피</p>
-        </Link>
-        <Link href="/badge" className="bg-white rounded-2xl p-4 shadow-sm text-center hover:shadow-md transition-shadow">
+        </button>
+        <button onClick={() => handleNav('/badge')} className="bg-white rounded-2xl p-4 shadow-sm text-center hover:shadow-md transition-shadow">
           <div className="text-2xl mb-1">🏅</div>
           <p className="font-semibold text-gray-700 text-sm">식재료 뱃지</p>
-        </Link>
+        </button>
       </div>
 
       {/* 광고 배너 */}
@@ -242,21 +248,12 @@ export default function Home() {
               </div>
             </div>
             <div className="flex gap-2 mt-4">
-              {profile ? (
-                <button
-                  onClick={() => setShowSetup(false)}
-                  className="flex-1 py-2 border rounded-lg text-gray-600"
-                >
-                  취소
-                </button>
-              ) : (
-                <button
-                  onClick={handleSkip}
-                  className="flex-1 py-2 border rounded-lg text-gray-400 text-sm"
-                >
-                  건너뛰기
-                </button>
-              )}
+              <button
+                onClick={() => { setShowSetup(false); setPendingNav(null); }}
+                className="flex-1 py-2 border rounded-lg text-gray-600"
+              >
+                취소
+              </button>
               <button
                 onClick={handleSaveProfile}
                 className="flex-1 py-2 bg-amber-400 text-white rounded-lg font-bold"
