@@ -28,8 +28,6 @@ export default function Home() {
       setProfile(p);
       const recipes = getSavedRecipes().slice(0, 3);
       setRecentRecipes(recipes.map(r => ({ title: r.title, id: r.id })));
-    } else {
-      setShowSetup(true);
     }
   }, []);
 
@@ -60,6 +58,19 @@ export default function Home() {
         <h1 className="text-3xl font-bold text-amber-700">🍼 베이비밀</h1>
         <p className="text-amber-600 mt-1 text-sm">오늘 뭐 먹이지? 고민 끝!</p>
       </div>
+
+      {/* 프로필 카드 - 프로필 없으면 설정 유도 배너 */}
+      {!profile && (
+        <div className="bg-amber-100 border border-amber-300 rounded-2xl p-4 mb-4 flex items-center justify-between">
+          <p className="text-sm text-amber-800">아이 정보를 입력하면 월령에 맞는 레시피를 추천해드려요</p>
+          <button
+            onClick={() => setShowSetup(true)}
+            className="ml-3 text-xs bg-amber-400 text-white px-3 py-1.5 rounded-full font-semibold whitespace-nowrap"
+          >
+            설정하기
+          </button>
+        </div>
+      )}
 
       {/* 프로필 카드 */}
       {profile && (
