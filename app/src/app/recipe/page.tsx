@@ -42,6 +42,7 @@ interface Warning {
 export default function RecipePage() {
   const [ageMonths, setAgeMonths] = useState(12);
   const [babyName, setBabyName] = useState('');
+  const [hasProfile, setHasProfile] = useState(true);
   const [selected, setSelected] = useState<string[]>([]);
   const [activeCategory, setActiveCategory] = useState('탄수화물');
   const [customInput, setCustomInput] = useState('');
@@ -56,6 +57,8 @@ export default function RecipePage() {
       setAgeMonths(getAgeMonths(p.birthDate));
       setBabyName(p.name);
       setAllergies(p.allergies ?? []);
+    } else {
+      setHasProfile(false);
     }
   }, []);
 
@@ -125,6 +128,14 @@ export default function RecipePage() {
         <a href="/" className="text-amber-600 text-sm">← 홈</a>
         <h1 className="text-xl font-bold text-gray-800">재료로 만들기</h1>
       </div>
+
+      {/* 프로필 없음 경고 */}
+      {!hasProfile && (
+        <div className="bg-yellow-50 border border-yellow-300 rounded-xl p-3 mb-3 text-sm text-yellow-800">
+          ⚠️ 아이 정보가 없어요. <strong>12개월(완료기) 기준</strong>으로 레시피를 만들어드려요.
+          <a href="/" className="ml-1 underline text-yellow-700">홈에서 정보 입력 →</a>
+        </div>
+      )}
 
       {/* 개월수 표시 */}
       <div className="bg-white rounded-xl p-3 mb-4 shadow-sm text-sm text-gray-600">
@@ -291,6 +302,39 @@ export default function RecipePage() {
           <AdBanner slot="ADSENSE_SLOT_RECIPE" className="mt-4 rounded-xl overflow-hidden" />
         </div>
       )}
+      {/* 재료별 가이드 */}
+      <div className="bg-white rounded-2xl p-5 shadow-sm mt-6">
+        <h2 className="font-bold text-gray-800 mb-3">📚 재료별 이유식 가이드</h2>
+        <div className="space-y-3 text-sm text-gray-600">
+          <div className="border-l-4 border-amber-200 pl-3">
+            <p className="font-semibold text-gray-700">🌾 탄수화물</p>
+            <p>쌀·고구마·감자는 초기부터 사용 가능. 오트밀은 9개월+, 밀가루·식빵은 알레르기 확인 후 도입하세요.</p>
+          </div>
+          <div className="border-l-4 border-amber-300 pl-3">
+            <p className="font-semibold text-gray-700">🥩 단백질</p>
+            <p>소고기는 6개월부터 필수 (철분 보충). 닭고기·두부는 9개월+, 달걀흰자는 12개월 이후 권장. 땅콩·견과류는 5세 미만 통째 금지.</p>
+          </div>
+          <div className="border-l-4 border-amber-400 pl-3">
+            <p className="font-semibold text-gray-700">🥦 채소</p>
+            <p>당근·애호박·브로콜리는 초기부터 사용 가능. 새로운 채소는 4일 이상 단독으로 먹여 알레르기 반응을 확인하세요.</p>
+          </div>
+          <div className="border-l-4 border-amber-500 pl-3">
+            <p className="font-semibold text-gray-700">🐟 해산물</p>
+            <p>흰살 생선(대구·명태)은 9개월+, 연어는 12개월+. 조개류는 알레르기 위험이 높으니 12개월 이후 소량부터 도입하세요.</p>
+          </div>
+        </div>
+      </div>
+
+      {/* 이유식 팁 */}
+      <div className="bg-amber-50 border border-amber-100 rounded-2xl p-5 shadow-sm mt-4 mb-6">
+        <h2 className="font-bold text-gray-800 mb-3">💡 재료 선택 팁</h2>
+        <ul className="space-y-2 text-sm text-gray-600">
+          <li>🔢 <strong>재료는 2~4가지</strong>가 적당해요. 너무 많으면 맛이 복잡해져요.</li>
+          <li>🥩 <strong>탄수화물 + 단백질 + 채소</strong> 조합이 영양 균형에 좋아요.</li>
+          <li>🆕 <strong>새 재료 도입 시</strong> 기존에 먹어본 재료와 함께 넣어주세요.</li>
+          <li>🌡️ <strong>소고기·닭고기</strong>는 완전히 익혀야 해요. 핑크빛 없어야 합니다.</li>
+        </ul>
+      </div>
     </main>
   );
 }

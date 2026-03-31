@@ -82,6 +82,7 @@ function getIngredientEmoji(ingredientStr: string): string {
 export default function GachaPage() {
   const [ageMonths, setAgeMonths] = useState(12);
   const [babyName, setBabyName] = useState('');
+  const [hasProfile, setHasProfile] = useState(true);
   const [animState, setAnimState] = useState<AnimState>('idle');
   const [displayEmojis, setDisplayEmojis] = useState(['🍳', '🍳', '🍳']);
   const [result, setResult] = useState<{ recipe: RecipeResult; warnings: Warning[]; stage: string } | null>(null);
@@ -99,6 +100,8 @@ export default function GachaPage() {
       setAgeMonths(getAgeMonths(p.birthDate));
       setBabyName(p.name);
       setAllergies(p.allergies ?? []);
+    } else {
+      setHasProfile(false);
     }
   }, []);
 
@@ -213,6 +216,14 @@ export default function GachaPage() {
         <a href="/" className="text-amber-600 text-sm">← 홈</a>
         <h1 className="text-xl font-bold text-gray-800">오늘의 이유식 뽑기</h1>
       </div>
+
+      {/* 프로필 없음 경고 */}
+      {!hasProfile && (
+        <div className="bg-yellow-50 border border-yellow-300 rounded-xl p-3 mb-3 text-sm text-yellow-800">
+          ⚠️ 아이 정보가 없어요. <strong>12개월(완료기) 기준</strong>으로 레시피를 뽑아드려요.
+          <a href="/" className="ml-1 underline text-yellow-700">홈에서 정보 입력 →</a>
+        </div>
+      )}
 
       <div className="bg-white rounded-xl p-3 mb-6 shadow-sm text-sm text-gray-600">
         {babyName && `${babyName} · `}{ageMonths}개월 맞춤 레시피를 AI가 뽑아드려요
