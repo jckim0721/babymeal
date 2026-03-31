@@ -303,7 +303,7 @@ export default function RecipePage() {
         </div>
       )}
       {/* 재료별 가이드 */}
-      <div className="bg-white rounded-2xl p-5 shadow-sm mt-6">
+      <div className="bg-white rounded-2xl p-5 shadow-sm mt-4">
         <h2 className="font-bold text-gray-800 mb-3">📚 재료별 이유식 가이드</h2>
         <div className="space-y-3 text-sm text-gray-600">
           <div className="border-l-4 border-amber-200 pl-3">
