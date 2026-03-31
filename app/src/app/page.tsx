@@ -123,14 +123,14 @@ export default function Home() {
       </div>
 
       <div className="grid grid-cols-2 gap-3 mb-6">
-        <button onClick={() => handleNavWithProfile('/history')} className="bg-white rounded-2xl p-4 shadow-sm text-center hover:shadow-md transition-shadow">
+        <Link href="/history" className="bg-white rounded-2xl p-4 shadow-sm text-center hover:shadow-md transition-shadow">
           <div className="text-2xl mb-1">📋</div>
           <p className="font-semibold text-gray-700 text-sm">저장된 레시피</p>
-        </button>
-        <button onClick={() => handleNavWithProfile('/badge')} className="bg-white rounded-2xl p-4 shadow-sm text-center hover:shadow-md transition-shadow">
+        </Link>
+        <Link href="/badge" className="bg-white rounded-2xl p-4 shadow-sm text-center hover:shadow-md transition-shadow">
           <div className="text-2xl mb-1">🏅</div>
           <p className="font-semibold text-gray-700 text-sm">식재료 뱃지</p>
-        </button>
+        </Link>
       </div>
 
       {/* 광고 배너 */}
