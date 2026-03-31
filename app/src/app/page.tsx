@@ -2,12 +2,15 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { getProfile, saveProfile, getAgeMonths, getSavedRecipes, BabyProfile } from '@/lib/localStorage';
 import AdBanner from '@/components/AdBanner';
 
 export default function Home() {
+  const router = useRouter();
   const [profile, setProfile] = useState<BabyProfile | null>(null);
   const [showSetup, setShowSetup] = useState(false);
+  const [pendingNav, setPendingNav] = useState<string | null>(null);
   const [form, setForm] = useState({ name: '', birthDate: '', allergies: [] as string[] });
 
   const ALLERGENS = ['계란', '우유', '밀', '땅콩', '견과류', '생선', '조개류', '콩/두부'];
@@ -37,6 +40,19 @@ export default function Home() {
     saveProfile(p);
     setProfile(p);
     setShowSetup(false);
+    if (pendingNav) {
+      router.push(pendingNav);
+      setPendingNav(null);
+    }
+  };
+
+  const handleNavWithProfile = (href: string) => {
+    if (!profile) {
+      setPendingNav(href);
+      setShowSetup(true);
+    } else {
+      router.push(href);
+    }
   };
 
   const ageMonths = profile ? getAgeMonths(profile.birthDate) : 0;
@@ -107,14 +123,14 @@ export default function Home() {
       </div>
 
       <div className="grid grid-cols-2 gap-3 mb-6">
-        <Link href="/history" className="bg-white rounded-2xl p-4 shadow-sm text-center hover:shadow-md transition-shadow">
+        <button onClick={() => handleNavWithProfile('/history')} className="bg-white rounded-2xl p-4 shadow-sm text-center hover:shadow-md transition-shadow">
           <div className="text-2xl mb-1">📋</div>
           <p className="font-semibold text-gray-700 text-sm">저장된 레시피</p>
-        </Link>
-        <Link href="/badge" className="bg-white rounded-2xl p-4 shadow-sm text-center hover:shadow-md transition-shadow">
+        </button>
+        <button onClick={() => handleNavWithProfile('/badge')} className="bg-white rounded-2xl p-4 shadow-sm text-center hover:shadow-md transition-shadow">
           <div className="text-2xl mb-1">🏅</div>
           <p className="font-semibold text-gray-700 text-sm">식재료 뱃지</p>
-        </Link>
+        </button>
       </div>
 
       {/* 광고 배너 */}
@@ -233,7 +249,7 @@ export default function Home() {
             </div>
             <div className="flex gap-2 mt-4">
               <button
-                onClick={() => setShowSetup(false)}
+                onClick={() => { setShowSetup(false); setPendingNav(null); }}
                 className="flex-1 py-2 border rounded-lg text-gray-600"
               >
                 취소
