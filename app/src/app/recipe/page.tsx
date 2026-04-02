@@ -4,6 +4,25 @@ import { useState, useEffect } from 'react';
 import { getProfile, getAgeMonths, saveRecipe, incrementRegenCount } from '@/lib/localStorage';
 import AdBanner from '@/components/AdBanner';
 
+// 월별 제철 재료 (1~12월)
+const SEASONAL_BY_MONTH: Record<number, string[]> = {
+  1:  ['시금치', '배추', '무', '홍합', '굴'],
+  2:  ['시금치', '배추', '무', '홍합', '굴', '딸기'],
+  3:  ['시금치', '딸기', '바지락'],
+  4:  ['딸기', '바지락', '새우'],
+  5:  ['딸기', '바지락', '새우'],
+  6:  ['수박', '참외', '복숭아'],
+  7:  ['수박', '참외', '복숭아', '옥수수', '감자'],
+  8:  ['수박', '참외', '복숭아', '옥수수', '감자'],
+  9:  ['사과', '배', '고구마', '버섯', '대구'],
+  10: ['사과', '배', '고구마', '버섯', '대구', '명태'],
+  11: ['배추', '무', '홍합', '굴', '대구', '명태'],
+  12: ['배추', '무', '홍합', '굴', '시금치'],
+};
+
+const CURRENT_MONTH = new Date().getMonth() + 1;
+const SEASONAL_ITEMS = new Set(SEASONAL_BY_MONTH[CURRENT_MONTH] ?? []);
+
 const INGREDIENTS_BY_CATEGORY: Record<string, string[]> = {
   '탄수화물': ['쌀', '찹쌀', '감자', '고구마', '단호박', '옥수수', '식빵', '오트밀', '밀가루'],
   '단백질': ['소고기', '닭고기', '돼지고기', '달걀', '두부', '연두부', '검은콩', '렌틸콩', '땅콩', '아몬드'],
@@ -50,6 +69,7 @@ export default function RecipePage() {
   const [result, setResult] = useState<{ recipe: RecipeResult; warnings: Warning[]; stage: string } | null>(null);
   const [saved, setSaved] = useState(false);
   const [allergies, setAllergies] = useState<string[]>([]);
+  const [seasonalOnly, setSeasonalOnly] = useState(false);
 
   useEffect(() => {
     const p = getProfile();
@@ -61,6 +81,8 @@ export default function RecipePage() {
       setHasProfile(false);
     }
   }, []);
+
+  const isSeasonalItem = (item: string): boolean => SEASONAL_ITEMS.has(item);
 
   const isAllergenItem = (item: string): boolean => {
     return allergies.some(allergy =>
@@ -161,15 +183,29 @@ export default function RecipePage() {
 
       {/* 재료 선택 */}
       <div className="bg-white rounded-xl p-4 mb-3 shadow-sm">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-xs text-gray-400">🌸 = 이달의 제철 재료</span>
+          <button
+            onClick={() => setSeasonalOnly(v => !v)}
+            className={`text-xs px-2 py-1 rounded-full border transition-colors ${
+              seasonalOnly ? 'bg-amber-100 border-amber-300 text-amber-700' : 'border-gray-200 text-gray-500'
+            }`}
+          >
+            {seasonalOnly ? '🌸 제철만 보기 ✓' : '제철만 보기'}
+          </button>
+        </div>
         <div className="flex flex-wrap gap-2">
-          {INGREDIENTS_BY_CATEGORY[activeCategory].map(item => {
+          {INGREDIENTS_BY_CATEGORY[activeCategory]
+            .filter(item => !seasonalOnly || isSeasonalItem(item))
+            .map(item => {
             const allergen = isAllergenItem(item);
+            const seasonal = isSeasonalItem(item);
             return (
               <button
                 key={item}
                 onClick={() => toggleIngredient(item)}
                 disabled={allergen}
-                title={allergen ? '알레르기 항목' : undefined}
+                title={allergen ? '알레르기 항목' : seasonal ? '이달의 제철 재료' : undefined}
                 className={`px-3 py-1.5 rounded-full text-sm transition-colors ${
                   allergen
                     ? 'bg-red-50 text-red-300 border border-red-200 line-through cursor-not-allowed'
@@ -178,7 +214,7 @@ export default function RecipePage() {
                     : 'bg-gray-100 text-gray-700'
                 }`}
               >
-                {allergen ? `🚫 ${item}` : item}
+                {allergen ? `🚫 ${item}` : seasonal ? `🌸 ${item}` : item}
               </button>
             );
           })}
